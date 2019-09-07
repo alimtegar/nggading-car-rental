@@ -1,6 +1,19 @@
 package handlers
 
-func getOrders(w http.ResponseWriter, r *http.Request) {
+import (
+	"context"
+	"encoding/json"
+	"net/http"
+	"time"
+
+	"github.com/alimtegar/nggading-car-rental-system/models"
+
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"gopkg.in/validator.v2"
+)
+
+func GetOrders(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	// var orders []Order
@@ -29,8 +42,8 @@ func getOrders(w http.ResponseWriter, r *http.Request) {
 		}}},
 		{{"$unwind", "$customer"}},
 		{{"$unwind", "$car"}},
-		{{"$unset", "customer_id"}},
-		{{"$unset", "car_id"}},
+		// {{"$unset", "customer_id"}},
+		// {{"$unset", "car_id"}},
 	}
 
 	cursor, err := collection.Aggregate(ctx, pipeline)
@@ -65,10 +78,10 @@ func getOrders(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(orders)
 }
 
-func addOrder(w http.ResponseWriter, r *http.Request) {
+func AddOrder(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	var order Order
+	var order models.Order
 
 	_ = json.NewDecoder(r.Body).Decode(&order)
 	order.CreatedAt = time.Now()

@@ -1,9 +1,24 @@
 package handlers
 
-func getCars(w http.ResponseWriter, r *http.Request) {
+import (
+	"context"
+	"encoding/json"
+	"net/http"
+	"time"
+
+	"github.com/alimtegar/nggading-car-rental-system/models"
+
+	"github.com/gorilla/mux"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+	"gopkg.in/validator.v2"
+)
+
+func GetCars(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	var cars []Car
+	var cars []models.Car
 
 	collection := client.Database("nggadingCarRentalSystem").Collection("cars")
 
@@ -23,7 +38,7 @@ func getCars(w http.ResponseWriter, r *http.Request) {
 	defer cursor.Close(ctx)
 
 	for cursor.Next(ctx) {
-		var car Car
+		var car models.Car
 
 		cursor.Decode(&car)
 
@@ -40,20 +55,20 @@ func getCars(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(cars)
 }
 
-func getCar(w http.ResponseWriter, r *http.Request) {
+func GetCar(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	params := mux.Vars(r)
 	id, _ := primitive.ObjectIDFromHex(params["id"])
 
-	var car Car
+	var car models.Car
 
 	collection := client.Database("nggadingCarRentalSystem").Collection("cars")
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 
 	defer cancel()
 
-	err := collection.FindOne(ctx, Car{ID: id}).Decode(&car)
+	err := collection.FindOne(ctx, models.Car{ID: id}).Decode(&car)
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -65,10 +80,10 @@ func getCar(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(car)
 }
 
-func addCar(w http.ResponseWriter, r *http.Request) {
+func AddCar(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	var car Car
+	var car models.Car
 
 	_ = json.NewDecoder(r.Body).Decode(&car)
 	car.CreatedAt = time.Now()
@@ -98,13 +113,13 @@ func addCar(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(result)
 }
 
-func updateCar(w http.ResponseWriter, r *http.Request) {
+func UpdateCar(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	params := mux.Vars(r)
 	id, _ := primitive.ObjectIDFromHex(params["id"])
 
-	var car Car
+	var car models.Car
 
 	_ = json.NewDecoder(r.Body).Decode(&car)
 	car.UpdatedAt = time.Now()
@@ -114,7 +129,7 @@ func updateCar(w http.ResponseWriter, r *http.Request) {
 
 	defer cancel()
 
-	result, err := collection.UpdateOne(ctx, Car{ID: id}, bson.M{"$set": car})
+	result, err := collection.UpdateOne(ctx, models.Car{ID: id}, bson.M{"$set": car})
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -126,7 +141,7 @@ func updateCar(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(result)
 }
 
-func deleteCar(w http.ResponseWriter, r *http.Request) {
+func DeleteCar(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	params := mux.Vars(r)
@@ -137,7 +152,7 @@ func deleteCar(w http.ResponseWriter, r *http.Request) {
 
 	defer cancel()
 
-	result, err := collection.DeleteOne(ctx, Car{ID: id})
+	result, err := collection.DeleteOne(ctx, models.Car{ID: id})
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

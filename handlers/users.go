@@ -1,9 +1,24 @@
 package handlers
 
-func getUsers(w http.ResponseWriter, r *http.Request) {
+import (
+	"context"
+	"encoding/json"
+	"net/http"
+	"time"
+
+	"github.com/alimtegar/nggading-car-rental-system/models"
+
+	"github.com/gorilla/mux"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+	"gopkg.in/validator.v2"
+)
+
+func GetUsers(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	var users []User
+	var users []models.User
 
 	collection := client.Database("nggadingCarRentalSystem").Collection("users")
 
@@ -23,7 +38,7 @@ func getUsers(w http.ResponseWriter, r *http.Request) {
 	defer cursor.Close(ctx)
 
 	for cursor.Next(ctx) {
-		var user User
+		var user models.User
 
 		cursor.Decode(&user)
 
@@ -40,20 +55,20 @@ func getUsers(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(users)
 }
 
-func getUser(w http.ResponseWriter, r *http.Request) {
+func GetUser(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	params := mux.Vars(r)
 	id, _ := primitive.ObjectIDFromHex(params["id"])
 
-	var user User
+	var user models.User
 
 	collection := client.Database("nggadingCarRentalSystem").Collection("users")
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 
 	defer cancel()
 
-	err := collection.FindOne(ctx, User{ID: id}).Decode(&user)
+	err := collection.FindOne(ctx, models.User{ID: id}).Decode(&user)
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -65,10 +80,10 @@ func getUser(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(user)
 }
 
-func addUser(w http.ResponseWriter, r *http.Request) {
+func AddUser(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	var user User
+	var user models.User
 
 	_ = json.NewDecoder(r.Body).Decode(&user)
 	user.CreatedAt = time.Now()
@@ -98,13 +113,13 @@ func addUser(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(result)
 }
 
-func updateUser(w http.ResponseWriter, r *http.Request) {
+func UpdateUser(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	params := mux.Vars(r)
 	id, _ := primitive.ObjectIDFromHex(params["id"])
 
-	var user User
+	var user models.User
 
 	_ = json.NewDecoder(r.Body).Decode(&user)
 	user.UpdatedAt = time.Now()
@@ -114,7 +129,7 @@ func updateUser(w http.ResponseWriter, r *http.Request) {
 
 	defer cancel()
 
-	result, err := collection.UpdateOne(ctx, User{ID: id}, bson.M{"$set": user})
+	result, err := collection.UpdateOne(ctx, models.User{ID: id}, bson.M{"$set": user})
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -126,7 +141,7 @@ func updateUser(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(result)
 }
 
-func deleteUser(w http.ResponseWriter, r *http.Request) {
+func DeleteUser(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	params := mux.Vars(r)
@@ -137,7 +152,7 @@ func deleteUser(w http.ResponseWriter, r *http.Request) {
 
 	defer cancel()
 
-	result, err := collection.DeleteOne(ctx, User{ID: id})
+	result, err := collection.DeleteOne(ctx, models.User{ID: id})
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
