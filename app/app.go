@@ -47,9 +47,17 @@ func (a *App) setRoutes() {
 	a.Router.HandleFunc("/cars/{id}", middlewares.ValidateUser(a.UpdateCar)).Methods("PUT")
 	a.Router.HandleFunc("/cars/{id}", middlewares.ValidateUser(a.DeleteCar)).Methods("DELETE")
 
+	// Customers Routes
+	a.Router.HandleFunc("/customers", middlewares.ValidateUser(a.GetCustomers)).Methods("GET")
+	a.Router.HandleFunc("/customers/{id}", middlewares.ValidateUser(a.GetCustomer)).Methods("GET")
+	a.Router.HandleFunc("/customers", middlewares.ValidateUser(a.AddCustomer)).Methods("POST")
+	a.Router.HandleFunc("/customers/{id}", middlewares.ValidateUser(a.UpdateCustomer)).Methods("PUT")
+	a.Router.HandleFunc("/customers/{id}", middlewares.ValidateUser(a.DeleteCustomer)).Methods("DELETE")
+
 	// Orders Routes
 	a.Router.HandleFunc("/orders", middlewares.ValidateUser(a.GetOrders)).Methods("GET")
 	a.Router.HandleFunc("/orders", middlewares.ValidateUser(a.AddOrder)).Methods("POST")
+	a.Router.HandleFunc("/orders/{id}", middlewares.ValidateUser(a.DeleteOrder)).Methods("DELETE")
 
 	// Auth Routes
 	a.Router.HandleFunc("/login", a.Login).Methods("POST")
@@ -78,8 +86,27 @@ func (a *App) AddCar(w http.ResponseWriter, r *http.Request)    { handlers.AddCa
 func (a *App) UpdateCar(w http.ResponseWriter, r *http.Request) { handlers.UpdateCar(a.Client, w, r) }
 func (a *App) DeleteCar(w http.ResponseWriter, r *http.Request) { handlers.DeleteCar(a.Client, w, r) }
 
+func (a *App) GetCustomers(w http.ResponseWriter, r *http.Request) {
+	handlers.GetCustomers(a.Client, w, r)
+}
+func (a *App) GetCustomer(w http.ResponseWriter, r *http.Request) {
+	handlers.GetCustomer(a.Client, w, r)
+}
+func (a *App) AddCustomer(w http.ResponseWriter, r *http.Request) {
+	handlers.AddCustomer(a.Client, w, r)
+}
+func (a *App) UpdateCustomer(w http.ResponseWriter, r *http.Request) {
+	handlers.UpdateCustomer(a.Client, w, r)
+}
+func (a *App) DeleteCustomer(w http.ResponseWriter, r *http.Request) {
+	handlers.DeleteCustomer(a.Client, w, r)
+}
+
 func (a *App) GetOrders(w http.ResponseWriter, r *http.Request) { handlers.GetOrders(a.Client, w, r) }
 func (a *App) AddOrder(w http.ResponseWriter, r *http.Request)  { handlers.AddOrder(a.Client, w, r) }
+func (a *App) DeleteOrder(w http.ResponseWriter, r *http.Request) {
+	handlers.DeleteOrder(a.Client, w, r)
+}
 
 func (a *App) Login(w http.ResponseWriter, r *http.Request)    { handlers.Login(a.Client, w, r) }
 func (a *App) Register(w http.ResponseWriter, r *http.Request) { handlers.Register(a.Client, w, r) }

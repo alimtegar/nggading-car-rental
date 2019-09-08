@@ -11,6 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"github.com/alimtegar/nggading-car-rental-system/models"
+	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"gopkg.in/validator.v2"
@@ -154,6 +155,30 @@ func AddOrder(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 	defer cancel()
 
 	result, err = collection.InsertOne(ctx, order)
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"message": "` + err.Error() + `"}`))
+
+		return
+	}
+
+	json.NewEncoder(w).Encode(result)
+}
+
+// DeleteOrder Handler
+func DeleteOrder(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	params := mux.Vars(r)
+	id, _ := primitive.ObjectIDFromHex(params["id"])
+
+	collection := client.Database("nggadingCarRentalSystem").Collection("orders")
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+
+	defer cancel()
+
+	result, err := collection.DeleteOne(ctx, models.Order{ID: id})
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

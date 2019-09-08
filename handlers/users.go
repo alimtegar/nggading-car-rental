@@ -15,6 +15,7 @@ import (
 	"gopkg.in/validator.v2"
 )
 
+// GetUsers Handler
 func GetUsers(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -55,6 +56,7 @@ func GetUsers(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(users)
 }
 
+// GetUser Handler
 func GetUser(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -81,6 +83,7 @@ func GetUser(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(user)
 }
 
+// AddUser Handler
 func AddUser(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -114,6 +117,7 @@ func AddUser(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(result)
 }
 
+// UpdateUser Handler
 func UpdateUser(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -142,6 +146,7 @@ func UpdateUser(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(result)
 }
 
+// DeleteUser Handler
 func DeleteUser(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
