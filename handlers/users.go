@@ -18,7 +18,7 @@ import (
 func GetUsers(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	var users []models.User
+	var users []models.ProtectedUser
 
 	collection := client.Database("nggadingCarRentalSystem").Collection("users")
 
@@ -38,7 +38,7 @@ func GetUsers(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 	defer cursor.Close(ctx)
 
 	for cursor.Next(ctx) {
-		var user models.User
+		var user models.ProtectedUser
 
 		cursor.Decode(&user)
 
@@ -61,13 +61,14 @@ func GetUser(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id, _ := primitive.ObjectIDFromHex(params["id"])
 
-	var user models.User
+	var user models.ProtectedUser
 
 	collection := client.Database("nggadingCarRentalSystem").Collection("users")
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 
 	defer cancel()
 
+	// err := collection.FindOne(ctx, models.User{ID: id}).Decode(&user)
 	err := collection.FindOne(ctx, models.User{ID: id}).Decode(&user)
 
 	if err != nil {

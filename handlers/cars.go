@@ -15,6 +15,7 @@ import (
 	"gopkg.in/validator.v2"
 )
 
+// GetCars Handler
 func GetCars(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -55,6 +56,7 @@ func GetCars(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(cars)
 }
 
+// GetCar Handler
 func GetCar(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -80,6 +82,7 @@ func GetCar(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(car)
 }
 
+// AddCar Handler
 func AddCar(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -113,6 +116,7 @@ func AddCar(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(result)
 }
 
+// UpdateCar Handler
 func UpdateCar(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -141,6 +145,7 @@ func UpdateCar(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(result)
 }
 
+// DeleteCar Handler
 func DeleteCar(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 

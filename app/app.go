@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/alimtegar/nggading-car-rental-system/handlers"
+	"github.com/alimtegar/nggading-car-rental-system/middlewares"
 	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -33,22 +34,26 @@ func (a *App) Initialize() {
 
 func (a *App) setRoutes() {
 	// Users Routes
-	a.Router.HandleFunc("/users", a.GetUsers).Methods("GET")
-	a.Router.HandleFunc("/users/{id}", a.GetUser).Methods("GET")
-	a.Router.HandleFunc("/users", a.AddUser).Methods("POST")
-	a.Router.HandleFunc("/users/{id}", a.UpdateUser).Methods("PUT")
-	a.Router.HandleFunc("/users/{id}", a.DeleteUser).Methods("DELETE")
+	a.Router.HandleFunc("/users", middlewares.ValidateUser(a.GetUsers)).Methods("GET")
+	a.Router.HandleFunc("/users/{id}", middlewares.ValidateUser(a.GetUser)).Methods("GET")
+	a.Router.HandleFunc("/users", middlewares.ValidateUser(a.AddUser)).Methods("POST")
+	a.Router.HandleFunc("/users/{id}", middlewares.ValidateUser(a.UpdateUser)).Methods("PUT")
+	a.Router.HandleFunc("/users/{id}", middlewares.ValidateUser(a.DeleteUser)).Methods("DELETE")
 
 	// Cars Routes
-	a.Router.HandleFunc("/cars", a.GetCars).Methods("GET")
-	a.Router.HandleFunc("/cars/{id}", a.GetCar).Methods("GET")
-	a.Router.HandleFunc("/cars", a.AddCar).Methods("POST")
-	a.Router.HandleFunc("/cars/{id}", a.UpdateCar).Methods("PUT")
-	a.Router.HandleFunc("/cars/{id}", a.DeleteCar).Methods("DELETE")
+	a.Router.HandleFunc("/cars", middlewares.ValidateUser(a.GetCars)).Methods("GET")
+	a.Router.HandleFunc("/cars/{id}", middlewares.ValidateUser(a.GetCar)).Methods("GET")
+	a.Router.HandleFunc("/cars", middlewares.ValidateUser(a.AddCar)).Methods("POST")
+	a.Router.HandleFunc("/cars/{id}", middlewares.ValidateUser(a.UpdateCar)).Methods("PUT")
+	a.Router.HandleFunc("/cars/{id}", middlewares.ValidateUser(a.DeleteCar)).Methods("DELETE")
 
 	// Orders Routes
-	a.Router.HandleFunc("/orders", a.GetOrders).Methods("GET")
-	a.Router.HandleFunc("/orders", a.AddOrder).Methods("POST")
+	a.Router.HandleFunc("/orders", middlewares.ValidateUser(a.GetOrders)).Methods("GET")
+	a.Router.HandleFunc("/orders", middlewares.ValidateUser(a.AddOrder)).Methods("POST")
+
+	// Auth Routes
+	a.Router.HandleFunc("/login", a.Login).Methods("POST")
+	a.Router.HandleFunc("/register", a.Register).Methods("POST")
 
 	// Hello World Routes
 	a.Router.HandleFunc("/hello-world", func(w http.ResponseWriter, r *http.Request) {
@@ -75,3 +80,6 @@ func (a *App) DeleteCar(w http.ResponseWriter, r *http.Request) { handlers.Delet
 
 func (a *App) GetOrders(w http.ResponseWriter, r *http.Request) { handlers.GetOrders(a.Client, w, r) }
 func (a *App) AddOrder(w http.ResponseWriter, r *http.Request)  { handlers.AddOrder(a.Client, w, r) }
+
+func (a *App) Login(w http.ResponseWriter, r *http.Request)    { handlers.Login(a.Client, w, r) }
+func (a *App) Register(w http.ResponseWriter, r *http.Request) { handlers.Register(a.Client, w, r) }
